@@ -28,17 +28,6 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
         .select-none { user-select: none; -webkit-user-select: none; }
-        
-        /* Progress Bar Animation for Long Press */
-        @keyframes loadWidth { from { width: 0; } to { width: 100%; } }
-        .holding-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 4px;
-            background-color: #6366f1; /* Indigo */
-            z-index: 50;
-        }
     </style>
 </head>
 <body>
@@ -96,7 +85,6 @@
             // Edit/Action Mode State
             const [editId, setEditId] = React.useState(null);
             const [actionItem, setActionItem] = React.useState(null); // Item selected after 10s hold
-            const [holdingId, setHoldingId] = React.useState(null); // Which item is being held
             const pressTimer = React.useRef(null); // Timer for long press
 
             // Fetch Data
@@ -140,18 +128,16 @@
                 }).format(num);
             };
 
-            // --- LONG PRESS LOGIC (10 Seconds) ---
+            // --- LONG PRESS LOGIC (10 Seconds - SECRET) ---
             const handlePressStart = (t) => {
                 // Clear any existing timer
                 if (pressTimer.current) clearTimeout(pressTimer.current);
-                setHoldingId(t.id); // Start visual feedback
 
                 pressTimer.current = setTimeout(() => {
                     // This runs only if held for 10 seconds
-                    setHoldingId(null);
                     if(window.navigator.vibrate) window.navigator.vibrate(200);
                     
-                    const pwd = prompt("🔐 అడ్మిన్ యాక్సెస్: పాస్‌వర్డ్ ఎంటర్ చేయండి (Admin Password):");
+                    const pwd = prompt("🔐 సెక్యూరిటీ యాక్సెస్: పాస్‌వర్డ్ ఎంటర్ చేయండి:");
                     if (pwd === ADMIN_PASSWORD) {
                         // Success! Show Action Menu
                         setActionItem(t); 
@@ -166,7 +152,6 @@
                     clearTimeout(pressTimer.current);
                     pressTimer.current = null;
                 }
-                setHoldingId(null); // Stop visual feedback
             };
 
             // --- ACTION MENU HANDLERS ---
@@ -191,9 +176,6 @@
                 const msg = `⚠️ హెచ్చరిక!\n\n"${t.description}" - ${formatCurrency(t.amount)}\n\nఈ ఎంట్రీని శాశ్వతంగా డిలీట్ చేస్తున్నారు.\nఇది వెనక్కి తీసుకోలేము.\n\nడిలీట్ చేయమంటారా?`;
                 
                 if(!window.confirm(msg)) return;
-
-                // Double check password logic embedded in action menu access, 
-                // but confirming action is good.
 
                 try {
                     await db.collection('transactions').doc(t.id).delete();
@@ -472,9 +454,7 @@
                             <span className="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full font-medium border border-indigo-100">Live Updates</span>
                         </div>
                         
-                        <div className="px-2 mb-2 text-[10px] text-slate-400 text-center">
-                            Tip: Hold any item for 10 seconds to Manage (Admin Only)
-                        </div>
+                        {/* SECRET FEATURE: NO TIP DISPLAYED */}
 
                         {transactions.length === 0 ? (
                             <div className="text-center py-12 opacity-40">
@@ -495,13 +475,7 @@
                                         onTouchStart={() => handlePressStart(t)}
                                         onTouchEnd={handlePressEnd}
                                     >
-                                        {/* Progress Bar (Visible only when holding THIS item) */}
-                                        {holdingId === t.id && (
-                                            <div 
-                                                className="holding-bar" 
-                                                style={{animation: 'loadWidth 10s linear forwards'}} 
-                                            />
-                                        )}
+                                        {/* NO VISIBLE PROGRESS BAR HERE - TOTAL SECRET */}
 
                                         <div className="flex items-start gap-3 relative z-10 pointer-events-none">
                                             <div className={`mt-1 p-2.5 rounded-full ${t.type === 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
