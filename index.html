@@ -7,47 +7,68 @@
     <!-- GOOGLE VERIFICATION -->
     <meta name="google-site-verification" content="oFcdua6fdfc1HBbQ9gqGTAIB-mgNMCF1saFyyufHx-M" />
     
-    <!-- SEO KEYWORDS & DESCRIPTION -->
-    <meta name="description" content="ICM Church Manugunuru Accounts - Official Digital Finance Ledger." />
-    <meta name="keywords" content="ICM Church, Manugunuru, Church Accounts, Church Finance" />
-    <meta name="author" content="ICM Church Admin" />
-
-    <!-- TITLE CHANGED HERE -->
     <title>ICM Church Manugunuru Accounts</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- React & ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <!-- Babel for JSX -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- GOOGLE SEARCH FAVICON (Updated Link) -->
+    <link rel="icon" href="https://drive.google.com/thumbnail?id=1UYqySNGlyww8sJcRFA4xLkosdUIu_QAS&sz=w256" type="image/x-icon" />
+    <link rel="shortcut icon" href="https://drive.google.com/thumbnail?id=1UYqySNGlyww8sJcRFA4xLkosdUIu_QAS&sz=w256" type="image/x-icon" />
+    <meta property="og:image" content="https://drive.google.com/thumbnail?id=1UYqySNGlyww8sJcRFA4xLkosdUIu_QAS&sz=w500" />
 
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- FIREBASE COMPAT SCRIPTS -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
+    <!-- ERROR HANDLER CSS -->
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .glass { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.2s ease-out forwards; }
         .select-none { user-select: none; -webkit-user-select: none; }
+        
+        #error-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 9999; padding: 20px; color: red; font-family: monospace;
+            overflow: auto;
+        }
     </style>
+
+    <!-- CRITICAL: ERROR CATCHING SCRIPT -->
+    <script>
+        window.onerror = function(msg, url, line, col, error) {
+            const overlay = document.getElementById('error-overlay');
+            if(overlay) {
+                overlay.style.display = 'block';
+                overlay.innerHTML += `<h3>💥 Error Detected:</h3><p>${msg}</p><p>Line: ${line}</p><hr>`;
+            }
+            return false;
+        };
+    </script>
+
+    <!-- RELIABLE CDNS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- FIREBASE -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div id="root"></div>
+    
+    <!-- ERROR OVERLAY (Hidden by default) -->
+    <div id="error-overlay">
+        <h2>⚠️ Something went wrong! (ఏదో ఎర్రర్ వచ్చింది)</h2>
+        <p>Please take a screenshot of this and show it to the developer.</p>
+        <hr>
+    </div>
 
     <script type="text/babel">
-        // --- ADMIN PASSWORD ---
+        // --- CONFIGURATION ---
         const ADMIN_PASSWORD = "admin5566"; 
+        // 🔴 LOGO LINK
+        const LOGO_URL = "https://drive.google.com/thumbnail?id=1UYqySNGlyww8sJcRFA4xLkosdUIu_QAS&sz=w256"; 
 
-        // --- FIREBASE CONFIGURATION (icm-church-web) ---
+        // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
           apiKey: "AIzaSyBp_NMUYpgEmjQ2mMGMqa0tZBlLQ8401wI",
           authDomain: "icm-church-web.firebaseapp.com",
@@ -57,26 +78,33 @@
           appId: "1:577289712683:web:97a7e923656127dc60266e"
         };
 
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            try {
+        // Initialize Firebase safely
+        try {
+            if (!firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
-            } catch (err) {
-                console.error("Firebase Init Error:", err);
             }
+        } catch(e) {
+            document.getElementById('error-overlay').style.display = 'block';
+            document.getElementById('error-overlay').innerHTML += `<p>Firebase Init Error: ${e.message}</p>`;
         }
+        
         const db = firebase.firestore();
 
-        // --- ICONS COMPONENT ---
+        // --- SAFE ICON COMPONENT ---
         const Icon = ({ name, size = 24, className = "" }) => {
             const iconRef = React.useRef(null);
             React.useEffect(() => {
-                if (iconRef.current) {
-                    lucide.createIcons({
-                        icons: { [name]: lucide.icons[name] },
-                        nameAttr: 'data-lucide',
-                        attrs: { class: className, width: size, height: size }
-                    });
+                try {
+                    const pascalName = name.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
+                    if (iconRef.current && (lucide.icons[pascalName] || lucide.icons[name])) {
+                        lucide.createIcons({
+                            icons: { [pascalName]: lucide.icons[pascalName] },
+                            nameAttr: 'data-lucide',
+                            attrs: { class: className, width: size, height: size }
+                        });
+                    }
+                } catch(e) {
+                    console.warn("Icon load error:", e);
                 }
             }, [name, size, className]);
             return <i ref={iconRef} data-lucide={name} className={className}></i>;
@@ -91,32 +119,36 @@
             const [loading, setLoading] = React.useState(true);
             const [isSubmitting, setIsSubmitting] = React.useState(false);
             const [showInputForm, setShowInputForm] = React.useState(false);
+            const [imgError, setImgError] = React.useState(false); 
             
-            // Edit/Action Mode State
             const [editId, setEditId] = React.useState(null);
-            const [actionItem, setActionItem] = React.useState(null); // Item selected after 10s hold
-            const pressTimer = React.useRef(null); // Timer for long press
+            const [actionItem, setActionItem] = React.useState(null); 
+            const pressTimer = React.useRef(null); 
 
             // Fetch Data
             React.useEffect(() => {
-                const unsubscribe = db.collection('transactions')
-                    .orderBy('date', 'desc')
-                    .onSnapshot((snapshot) => {
-                        const data = snapshot.docs.map(doc => ({
-                            id: doc.id,
-                            ...doc.data()
-                        }));
-                        setTransactions(data);
-                        setLoading(false);
-                    }, (error) => {
-                        console.error("Error fetching data: ", error);
-                        setLoading(false);
-                        if(error.code === 'permission-denied') {
-                            alert("🚨 ERROR: Permission Denied! Check Firestore Rules.");
-                        }
-                    });
-
-                return () => unsubscribe();
+                try {
+                    const unsubscribe = db.collection('transactions')
+                        .orderBy('date', 'desc')
+                        .onSnapshot((snapshot) => {
+                            const data = snapshot.docs.map(doc => ({
+                                id: doc.id,
+                                ...doc.data()
+                            }));
+                            setTransactions(data);
+                            setLoading(false);
+                        }, (error) => {
+                            console.error("Fetch Error:", error);
+                            setLoading(false);
+                            if(error.code === 'permission-denied') {
+                                alert("⚠️ Database Locked! Please update Rules in Firebase Console.");
+                            }
+                        });
+                    return () => unsubscribe();
+                } catch(e) {
+                    console.error("Setup Error:", e);
+                    setLoading(false);
+                }
             }, []);
 
             // Calculations
@@ -138,18 +170,16 @@
                 }).format(num);
             };
 
-            // --- LONG PRESS LOGIC (10 Seconds - SECRET) ---
+            // Handlers
             const handlePressStart = (t) => {
                 if (pressTimer.current) clearTimeout(pressTimer.current);
-
                 pressTimer.current = setTimeout(() => {
                     if(window.navigator.vibrate) window.navigator.vibrate(200);
-                    
-                    const pwd = prompt("🔐 సెక్యూరిటీ యాక్సెస్: పాస్‌వర్డ్ ఎంటర్ చేయండి:");
+                    const pwd = prompt("🔐 Admin Password:");
                     if (pwd === ADMIN_PASSWORD) {
                         setActionItem(t); 
                     } else if (pwd !== null) {
-                        alert("🛑 తప్పు పాస్‌వర్డ్! యాక్సెస్ నిరాకరించబడింది.");
+                        alert("Wrong Password!");
                     }
                 }, 10000); 
             };
@@ -161,7 +191,6 @@
                 }
             };
 
-            // --- ACTION MENU HANDLERS ---
             const openEditMode = () => {
                 const t = actionItem;
                 setAmount(t.amount);
@@ -172,85 +201,52 @@
                 setShowInputForm(true);
                 setActionItem(null);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-                alert("✏️ ఎడిట్ మోడ్ ఆన్ అయ్యింది. ఫామ్ లో వివరాలు మార్చి అప్‌డేట్ చేయండి.");
             };
 
             const performDelete = async () => {
-                const t = actionItem;
-                const msg = `⚠️ హెచ్చరిక!\n\n"${t.description}" - ${formatCurrency(t.amount)}\n\nఈ ఎంట్రీని శాశ్వతంగా డిలీట్ చేస్తున్నారు.\nఇది వెనక్కి తీసుకోలేము.\n\nడిలీట్ చేయమంటారా?`;
-                
-                if(!window.confirm(msg)) return;
-
+                if(!window.confirm("Delete this entry permanently?")) return;
                 try {
-                    await db.collection('transactions').doc(t.id).delete();
+                    await db.collection('transactions').doc(actionItem.id).delete();
                     setActionItem(null); 
-                    alert("🗑️ డిలీట్ చేశారు!");
                 } catch (error) {
-                    alert("Delete Failed!");
+                    alert("Delete Failed: " + error.message);
                 }
             };
 
-            const cancelEdit = () => {
-                setEditId(null);
-                setAmount('');
-                setDesc('');
-                setPassword('');
-                setShowInputForm(false);
-            }
-
-            // --- SAVE / UPDATE HANDLER ---
             const handleSaveOrUpdate = async (e) => {
                 e.preventDefault();
                 if (!amount || !desc || !password) return;
                 
                 if (password !== ADMIN_PASSWORD) {
-                    alert("🛑 Wrong Password! (పాస్‌వర్డ్ తప్పు)");
+                    alert("Wrong Password!");
                     return;
                 }
 
                 setIsSubmitting(true);
-
                 try {
                     if (editId) {
-                        const confirmMsg = `⚠️ అప్‌డేట్ కన్ఫర్మేషన్:\n\nపాత రికార్డు మారుస్తున్నారు.\nకొత్త అమౌంట్: ${formatCurrency(amount)}\nకొత్త వివరం: ${desc}\n\nసేవ్ చేయమంటారా?`;
-                        if (!window.confirm(confirmMsg)) {
-                            setIsSubmitting(false);
-                            return;
-                        }
-
+                        if (!window.confirm("Confirm Update?")) { setIsSubmitting(false); return; }
                         await db.collection('transactions').doc(editId).update({
                             amount: Number(amount),
                             description: desc,
                             type: type,
-                            lastEdited: firebase.firestore.FieldValue.serverTimestamp(),
-                            lastEditedBy: 'Admin'
+                            lastEdited: firebase.firestore.FieldValue.serverTimestamp()
                         });
-                        alert("✅ అప్‌డేట్ అయ్యింది!");
-                        cancelEdit();
-
+                        alert("Updated!");
+                        setEditId(null); setAmount(''); setDesc(''); setPassword(''); setShowInputForm(false);
                     } else {
-                        const confirmMsg = `కొత్త ఎంట్రీ:\n\nఅమౌంట్: ${formatCurrency(amount)}\nవివరం: ${desc}\nరకం: ${type === 'income' ? 'ఆదాయం' : 'ఖర్చు'}\n\nసేవ్ చేయమంటారా?`;
-                        if (!window.confirm(confirmMsg)) {
-                            setIsSubmitting(false);
-                            return;
-                        }
-
+                        if (!window.confirm("Confirm Save?")) { setIsSubmitting(false); return; }
                         await db.collection('transactions').add({
                             amount: Number(amount),
                             description: desc,
                             type: type,
                             date: firebase.firestore.FieldValue.serverTimestamp(),
-                            displayDate: new Date().toLocaleDateString('en-GB'),
-                            addedBy: 'Admin'
+                            displayDate: new Date().toLocaleDateString('en-GB')
                         });
-                        alert("✅ సేవ్ అయ్యింది!");
-                        setAmount('');
-                        setDesc('');
-                        setPassword('');
-                        setShowInputForm(false);
+                        alert("Saved!");
+                        setAmount(''); setDesc(''); setPassword(''); setShowInputForm(false);
                     }
                 } catch (error) {
-                    console.error("Error: ", error);
                     alert("Error: " + error.message);
                 }
                 setIsSubmitting(false);
@@ -260,92 +256,70 @@
                 return (
                     <div className="min-h-screen flex items-center justify-center bg-slate-50 flex-col gap-4">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                        <p className="text-slate-400 text-sm">Loading Church Data...</p>
+                        <p className="text-slate-400 text-sm">Loading...</p>
                     </div>
                 );
             }
 
             return (
                 <div className="max-w-md mx-auto bg-slate-50 min-h-screen shadow-xl relative pb-24">
-                    
-                    {/* --- ACTION MODAL (Pop-up after 10s Hold) --- */}
+                    {/* ACTION MODAL */}
                     {actionItem && (
                         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-                            <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl transform transition-all scale-100">
-                                <div className="text-center mb-6">
-                                    <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3 text-indigo-600">
-                                        <Icon name="settings-2" size={24} />
-                                    </div>
-                                    <h3 className="text-xl font-bold text-gray-800">Manage Entry</h3>
-                                    <p className="text-sm text-slate-400">Select an action (Admin Verified)</p>
-                                </div>
-
-                                <div className="bg-slate-50 p-4 rounded-xl mb-6 border border-slate-200">
-                                    <p className="font-semibold text-gray-700 text-lg">{actionItem.description}</p>
-                                    <p className={`font-bold text-xl ${actionItem.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                        {actionItem.type === 'income' ? '+' : '-'} {formatCurrency(actionItem.amount)}
-                                    </p>
-                                    <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-                                        <Icon name="calendar" size={12}/> {actionItem.displayDate}
-                                    </p>
-                                </div>
-                                
+                            <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-2xl">
+                                <h3 className="text-xl font-bold text-center mb-4">Manage Entry</h3>
                                 <div className="space-y-3">
-                                    <button 
-                                        onClick={openEditMode}
-                                        className="w-full py-3.5 bg-amber-100 text-amber-800 font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-amber-200 active:scale-95 transition shadow-sm"
-                                    >
-                                        <Icon name="pencil" size={18} /> Edit / Modify
+                                    <button onClick={openEditMode} className="w-full py-3 bg-amber-100 text-amber-800 font-bold rounded-xl flex items-center justify-center gap-2">
+                                        <Icon name="pencil" size={18} /> Edit
                                     </button>
-                                    <button 
-                                        onClick={performDelete}
-                                        className="w-full py-3.5 bg-rose-100 text-rose-700 font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-rose-200 active:scale-95 transition shadow-sm"
-                                    >
-                                        <Icon name="trash-2" size={18} /> Delete Permanently
+                                    <button onClick={performDelete} className="w-full py-3 bg-rose-100 text-rose-700 font-bold rounded-xl flex items-center justify-center gap-2">
+                                        <Icon name="trash-2" size={18} /> Delete
                                     </button>
-                                    <button 
-                                        onClick={() => setActionItem(null)}
-                                        className="w-full py-3 text-slate-400 font-semibold text-sm hover:text-slate-600 mt-2"
-                                    >
-                                        Cancel
-                                    </button>
+                                    <button onClick={() => setActionItem(null)} className="w-full py-2 text-slate-400">Cancel</button>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* HERO SECTION */}
+                    {/* HEADER */}
                     <div className="bg-indigo-700 text-white pt-8 pb-10 px-6 rounded-b-[2.5rem] shadow-xl relative z-0">
                         <div className="flex justify-between items-start mb-6">
                             <div className="flex items-center gap-3">
-                                <div className="bg-indigo-600 p-2 rounded-lg">
-                                    <Icon name="church" size={32} className="text-white" />
+                                {/* LOGO CONTAINER */}
+                                <div className={`rounded-lg overflow-hidden flex items-center justify-center ${LOGO_URL && !imgError ? 'bg-white w-12 h-12' : 'bg-indigo-600 p-2'}`}>
+                                    {LOGO_URL && !imgError ? (
+                                        <img 
+                                            src={LOGO_URL} 
+                                            alt="Logo" 
+                                            className="w-full h-full object-cover" 
+                                            onError={() => {
+                                                console.log("Image Load Failed");
+                                                setImgError(true);
+                                            }}
+                                            referrerPolicy="no-referrer"
+                                        />
+                                    ) : (
+                                        <Icon name="church" size={32} className="text-white" />
+                                    )}
                                 </div>
                                 <div>
-                                    <h1 className="font-bold text-xl tracking-tight leading-tight">ICM CHURCH</h1>
+                                    <h1 className="font-bold text-xl tracking-tight">ICM CHURCH</h1>
                                     <div className="flex items-center gap-1 text-indigo-200 text-xs">
-                                        <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
-                                        Manugunuru • Accounts
+                                        <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> Manugunuru • Accounts
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                         <div className="text-center mt-4">
-                            <p className="text-indigo-200 text-sm font-medium mb-1 uppercase tracking-widest text-[10px]">Total Treasury Balance</p>
-                            <h2 className="text-5xl font-bold mb-6 drop-shadow-sm tracking-tight">{formatCurrency(balance)}</h2>
-                            
+                            <p className="text-indigo-200 text-sm font-medium mb-1 uppercase text-[10px]">Total Balance</p>
+                            <h2 className="text-5xl font-bold mb-6 drop-shadow-sm">{formatCurrency(balance)}</h2>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="glass p-3 rounded-2xl">
-                                    <div className="flex items-center justify-center gap-1 text-emerald-300 mb-1 text-[10px] font-bold uppercase tracking-wider">
-                                        <Icon name="trending-up" size={12} /> Received
-                                    </div>
+                                    <div className="flex justify-center text-emerald-300 mb-1 text-[10px] font-bold uppercase"><Icon name="trending-up" size={12} /> Received</div>
                                     <p className="text-lg font-semibold">{formatCurrency(totalIncome)}</p>
                                 </div>
                                 <div className="glass p-3 rounded-2xl">
-                                    <div className="flex items-center justify-center gap-1 text-rose-300 mb-1 text-[10px] font-bold uppercase tracking-wider">
-                                        <Icon name="trending-down" size={12} /> Spent
-                                    </div>
+                                    <div className="flex justify-center text-rose-300 mb-1 text-[10px] font-bold uppercase"><Icon name="trending-down" size={12} /> Spent</div>
                                     <p className="text-lg font-semibold">{formatCurrency(totalExpense)}</p>
                                 </div>
                             </div>
@@ -355,91 +329,27 @@
                     {/* ADMIN TOGGLE */}
                     {!editId && (
                         <div className="px-6 -mt-5 relative z-10 flex justify-center">
-                            <button 
-                                onClick={() => setShowInputForm(!showInputForm)}
-                                className="bg-white text-indigo-700 px-6 py-2.5 rounded-full shadow-lg font-bold text-sm flex items-center gap-2 hover:scale-105 active:scale-95 transition-all border border-indigo-50"
-                            >
-                                {showInputForm ? (
-                                    <><span className="text-rose-500">Close Panel</span> <Icon name="x" size={16}/></>
-                                ) : (
-                                    <><Icon name="lock" size={14}/> Add Transaction</>
-                                )}
+                            <button onClick={() => setShowInputForm(!showInputForm)} className="bg-white text-indigo-700 px-6 py-2.5 rounded-full shadow-lg font-bold text-sm flex items-center gap-2 hover:scale-105 active:scale-95 transition-all border border-indigo-50">
+                                {showInputForm ? <><span className="text-rose-500">Close</span> <Icon name="x" size={16}/></> : <><Icon name="lock" size={14}/> Add Data</>}
                             </button>
                         </div>
                     )}
 
-                    {/* INPUT FORM (Add / Edit) */}
+                    {/* FORM */}
                     {(showInputForm || editId) && (
                         <div className="px-4 mt-4 animate-fade-in relative z-20">
-                            {editId && (
-                                <div className="bg-amber-100 text-amber-800 px-4 py-2 rounded-t-xl text-xs font-bold text-center border-x border-t border-amber-200">
-                                    ✏️ Editing Mode Active
-                                </div>
-                            )}
-                            <div className={`bg-white rounded-2xl shadow-xl p-5 border ${editId ? 'border-amber-300 rounded-t-none' : 'border-indigo-100'}`}>
+                            <div className={`bg-white rounded-2xl shadow-xl p-5 border ${editId ? 'border-amber-300' : 'border-indigo-100'}`}>
                                 <div className="flex gap-2 mb-4 bg-slate-100 p-1 rounded-xl">
-                                    <button 
-                                        onClick={() => setType('income')}
-                                        className={`flex-1 py-2 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 ${type === 'income' ? 'bg-emerald-500 text-white shadow-md' : 'text-slate-500 hover:bg-slate-200'}`}
-                                    >
-                                        <Icon name="plus" size={16} /> In
-                                    </button>
-                                    <button 
-                                        onClick={() => setType('expense')}
-                                        className={`flex-1 py-2 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 ${type === 'expense' ? 'bg-rose-500 text-white shadow-md' : 'text-slate-500 hover:bg-slate-200'}`}
-                                    >
-                                        <Icon name="trending-down" size={16} /> Out
-                                    </button>
+                                    <button onClick={() => setType('income')} className={`flex-1 py-2 rounded-lg text-sm font-bold flex justify-center gap-2 ${type === 'income' ? 'bg-emerald-500 text-white' : 'text-slate-500'}`}><Icon name="plus" size={16} /> In</button>
+                                    <button onClick={() => setType('expense')} className={`flex-1 py-2 rounded-lg text-sm font-bold flex justify-center gap-2 ${type === 'expense' ? 'bg-rose-500 text-white' : 'text-slate-500'}`}><Icon name="trending-down" size={16} /> Out</button>
                                 </div>
-
                                 <form onSubmit={handleSaveOrUpdate} className="space-y-3">
-                                    <input 
-                                        type="number" 
-                                        placeholder="Amount (₹)" 
-                                        className="w-full text-lg font-semibold px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
-                                        value={amount}
-                                        onChange={(e) => setAmount(e.target.value)}
-                                        required
-                                    />
-                                    <input 
-                                        type="text" 
-                                        placeholder="Description (Ex: Sunday Offering)" 
-                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
-                                        value={desc}
-                                        onChange={(e) => setDesc(e.target.value)}
-                                        required
-                                    />
-                                    
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <Icon name="shield-check" size={18} className="text-indigo-400" />
-                                        </div>
-                                        <input 
-                                            type="text" 
-                                            placeholder="Enter Admin Password to Save" 
-                                            className="w-full pl-10 px-4 py-3 bg-indigo-50 border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-indigo-900 font-mono text-sm"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            required
-                                        />
-                                    </div>
-
+                                    <input type="number" placeholder="Amount (₹)" className="w-full text-lg font-semibold px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+                                    <input type="text" placeholder="Description" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl" value={desc} onChange={(e) => setDesc(e.target.value)} required />
+                                    <input type="text" placeholder="Admin Password" className="w-full px-4 py-3 bg-indigo-50 border border-indigo-200 rounded-xl" value={password} onChange={(e) => setPassword(e.target.value)} required />
                                     <div className="flex gap-2">
-                                        {editId && (
-                                            <button 
-                                                type="button"
-                                                onClick={cancelEdit}
-                                                className="flex-1 py-3.5 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 transition"
-                                            >
-                                                Cancel
-                                            </button>
-                                        )}
-                                        <button 
-                                            disabled={isSubmitting}
-                                            className={`flex-1 py-3.5 rounded-xl font-bold text-white shadow-lg active:scale-95 transition flex items-center justify-center gap-2 ${editId ? 'bg-amber-600 hover:bg-amber-700' : (type === 'income' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700')}`}
-                                        >
-                                            {isSubmitting ? 'Checking...' : (editId ? 'Update Transaction' : (type === 'income' ? 'Save Income' : 'Save Expense'))}
-                                        </button>
+                                        {editId && <button type="button" onClick={() => {setEditId(null); setShowInputForm(false)}} className="flex-1 py-3 bg-slate-100 rounded-xl font-bold text-slate-500">Cancel</button>}
+                                        <button disabled={isSubmitting} className={`flex-1 py-3.5 rounded-xl font-bold text-white shadow-lg ${editId ? 'bg-amber-600' : 'bg-indigo-600'}`}>{isSubmitting ? '...' : 'Save'}</button>
                                     </div>
                                 </form>
                             </div>
@@ -448,59 +358,32 @@
 
                     {/* LIST */}
                     <div className="px-4 mt-8 pb-10">
-                        <div className="flex items-center justify-between text-slate-500 mb-4 px-2">
-                            <div className="flex items-center gap-2">
-                                <Icon name="history" size={16} />
-                                <h3 className="font-bold text-xs uppercase tracking-wider">Recent Activity</h3>
-                            </div>
-                            <span className="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full font-medium border border-indigo-100">Live Updates</span>
-                        </div>
-
                         {transactions.length === 0 ? (
-                            <div className="text-center py-12 opacity-40">
-                                <div className="flex justify-center mb-3">
-                                    <Icon name="wallet" size={48} className="text-slate-400" />
-                                </div>
-                                <p className="text-slate-500 font-medium">No records found</p>
-                            </div>
+                            <div className="text-center py-12 opacity-40"><Icon name="wallet" size={48} className="text-slate-400 mx-auto" /><p>No records</p></div>
                         ) : (
                             <div className="space-y-3 select-none">
                                 {transactions.map((t) => (
-                                    <div 
-                                        key={t.id} 
-                                        className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center group active:scale-[0.98] transition-all relative overflow-hidden"
-                                        onMouseDown={() => handlePressStart(t)}
-                                        onMouseUp={handlePressEnd}
-                                        onMouseLeave={handlePressEnd}
-                                        onTouchStart={() => handlePressStart(t)}
-                                        onTouchEnd={handlePressEnd}
+                                    <div key={t.id} className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center relative overflow-hidden"
+                                        onMouseDown={() => handlePressStart(t)} onMouseUp={handlePressEnd} onMouseLeave={handlePressEnd} onTouchStart={() => handlePressStart(t)} onTouchEnd={handlePressEnd}
                                     >
-                                        <div className="flex items-start gap-3 relative z-10 pointer-events-none">
-                                            <div className={`mt-1 p-2.5 rounded-full ${t.type === 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                                        <div className="flex items-start gap-3 pointer-events-none">
+                                            <div className={`mt-1 p-2 rounded-full ${t.type === 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
                                                 <Icon name={t.type === 'income' ? 'trending-up' : 'trending-down'} size={16} />
                                             </div>
                                             <div>
                                                 <h4 className="font-semibold text-gray-800 text-sm">{t.description}</h4>
-                                                <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
-                                                    <Icon name="calendar" size={12} />
-                                                    {t.displayDate || 'Date N/A'}
-                                                </div>
+                                                <div className="flex items-center gap-2 text-xs text-slate-400 mt-1"><Icon name="calendar" size={12} /> {t.displayDate}</div>
                                             </div>
                                         </div>
-                                        <div className="text-right relative z-10">
-                                            <p className={`font-bold text-sm ${t.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                                {t.type === 'income' ? '+' : '-'} {formatCurrency(t.amount)}
-                                            </p>
+                                        <div className="text-right pointer-events-none">
+                                            <p className={`font-bold text-sm ${t.type === 'income' ? 'text-emerald-600' : 'text-rose-600'}`}>{t.type === 'income' ? '+' : '-'} {formatCurrency(t.amount)}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         )}
                     </div>
-                    
-                    <div className="text-center text-slate-300 text-[10px] pb-4">
-                        ICM Church Manugunuru • Accounts
-                    </div>
+                    <div className="text-center text-slate-300 text-[10px] pb-4">ICM Church Manugunuru • Accounts</div>
                 </div>
             );
         };
