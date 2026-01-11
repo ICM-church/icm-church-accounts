@@ -592,7 +592,7 @@
                                     </div>
                                     {billImage && <div className="w-full h-24 bg-slate-100 rounded-lg overflow-hidden border border-slate-200 relative"><img src={billImage} className="w-full h-full object-cover opacity-80" /></div>}
 
-                                    <input type="text" placeholder="Admin Password (admin5566)" className="w-full px-4 py-3 bg-indigo-50 border border-indigo-200 rounded-xl" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                                    <input type="text" placeholder="Admin Password" className="w-full px-4 py-3 bg-indigo-50 border border-indigo-200 rounded-xl" value={password} onChange={(e) => setPassword(e.target.value)} required />
                                     <div className="flex gap-2">
                                         {editId && <button type="button" onClick={resetForm} className="flex-1 py-3 bg-slate-100 rounded-xl font-bold text-slate-500">Cancel</button>}
                                         <button disabled={isSubmitting} className={`flex-1 py-3.5 rounded-xl font-bold text-white shadow-lg ${editId ? 'bg-amber-600' : 'bg-indigo-600'}`}>{isSubmitting ? '...' : 'Save'}</button>
